@@ -1,0 +1,13 @@
+{
+  "name": "snoonu-rider-portal-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Snoonu Rider Portal mock with the OpenCX agentic support widget embedded — stage-aware (on the way to merchant / at merchant / on the way to customer), pre-wired with rider profile + supplier directory + documented L2 workflows.",
+  "scripts": {
+    "dev": "python3 -m http.server 8765",
+    "start": "python3 -m http.server 8765"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

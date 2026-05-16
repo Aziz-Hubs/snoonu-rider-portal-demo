@@ -1,0 +1,1130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Snoonu Rider Portal — Bilal Hasan</title>
+    <meta name="description" content="Snoonu Rider Portal — manage your earnings, schedule, documents and deliveries." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --brand: #d90217;
+        --brand-dark: #b30018;
+        --brand-soft: #fff1f2;
+        --ink: #0c0c0e;
+        --ink-2: #2a2a2e;
+        --muted: #6b6b73;
+        --muted-2: #98989f;
+        --line: #ececef;
+        --line-2: #f5f5f7;
+        --bg: #f7f7f8;
+        --surface: #ffffff;
+        --green: #10b981;
+        --green-soft: #d1fae5;
+        --amber: #f59e0b;
+        --amber-soft: #fef3c7;
+        --blue: #3b82f6;
+        --blue-soft: #dbeafe;
+        --purple: #8b5cf6;
+        --purple-soft: #ede9fe;
+        --shadow-sm: 0 1px 2px rgba(12, 12, 14, 0.04);
+        --shadow-md: 0 4px 16px rgba(12, 12, 14, 0.06);
+        --shadow-lg: 0 16px 40px rgba(12, 12, 14, 0.08);
+        --radius: 16px;
+        --radius-sm: 10px;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+        color: var(--ink);
+        background: var(--bg);
+        font-size: 14px;
+        line-height: 1.45;
+        -webkit-font-smoothing: antialiased;
+      }
+      a { color: inherit; text-decoration: none; }
+      button { font: inherit; cursor: pointer; }
+      img { max-width: 100%; display: block; }
+
+      .app {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        min-height: 100vh;
+      }
+
+      /* --- Sidebar --- */
+      .sidebar {
+        background: var(--surface);
+        border-right: 1px solid var(--line);
+        padding: 22px 16px;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .brand-logo { display: flex; align-items: center; gap: 10px; padding: 4px 8px 18px; }
+      .brand-logo .label-stack { display: flex; flex-direction: column; gap: 0; line-height: 1; }
+      .brand-logo .portal {
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+      .nav-section {
+        font-size: 10.5px;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--muted-2);
+        font-weight: 700;
+        padding: 12px 12px 6px;
+      }
+      .nav-item {
+        display: flex; align-items: center; gap: 12px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        font-weight: 600; font-size: 13.5px;
+        color: var(--ink-2);
+        transition: background .12s, color .12s;
+      }
+      .nav-item:hover { background: var(--line-2); color: var(--ink); }
+      .nav-item.active { background: var(--brand-soft); color: var(--brand); }
+      .nav-item .ic {
+        width: 18px; height: 18px;
+        flex-shrink: 0;
+        opacity: 0.85;
+      }
+      .nav-item .badge {
+        margin-left: auto;
+        background: var(--brand);
+        color: #fff;
+        font-size: 10.5px;
+        font-weight: 800;
+        padding: 2px 7px;
+        border-radius: 999px;
+      }
+      .sidebar .spacer { flex: 1; }
+      .rider-card {
+        background: var(--line-2);
+        border-radius: 14px;
+        padding: 12px;
+        display: flex; align-items: center; gap: 10px;
+      }
+      .rider-card .avatar {
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff6a3d, #d90217);
+        display: grid; place-items: center;
+        color: #fff; font-weight: 800; font-size: 14px;
+        flex-shrink: 0;
+      }
+      .rider-card .stack { display: flex; flex-direction: column; line-height: 1.2; min-width: 0; }
+      .rider-card .name { font-weight: 700; font-size: 13px; }
+      .rider-card .id { font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+      /* --- Main --- */
+      .main {
+        display: flex;
+        flex-direction: column;
+      }
+      .topbar {
+        border-bottom: 1px solid var(--line);
+        padding: 14px 32px;
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 16px;
+        position: sticky; top: 0; z-index: 10;
+        backdrop-filter: saturate(180%) blur(8px);
+        background: rgba(255,255,255,0.92);
+      }
+      .topbar .left { display: flex; align-items: center; gap: 14px; }
+      .breadcrumb {
+        display: flex; align-items: center; gap: 8px;
+        font-size: 12.5px; color: var(--muted);
+      }
+      .breadcrumb .here { color: var(--ink); font-weight: 600; }
+      .topbar .right { display: flex; align-items: center; gap: 10px; }
+      .iconbtn {
+        width: 36px; height: 36px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--surface);
+        display: grid; place-items: center;
+        color: var(--ink-2);
+        position: relative;
+      }
+      .iconbtn:hover { border-color: var(--ink-2); }
+      .iconbtn .dot {
+        position: absolute; top: 6px; right: 6px;
+        width: 8px; height: 8px;
+        border-radius: 50%; background: var(--brand);
+        border: 2px solid var(--surface);
+      }
+
+      .online-toggle {
+        display: flex; align-items: center; gap: 10px;
+        padding: 6px 12px 6px 6px;
+        background: var(--green-soft);
+        color: #047857;
+        border-radius: 999px;
+        font-weight: 700; font-size: 13px;
+        border: 0;
+      }
+      .online-toggle .pulse {
+        width: 24px; height: 24px;
+        background: #fff;
+        border-radius: 50%;
+        display: grid; place-items: center;
+        position: relative;
+      }
+      .online-toggle .pulse::after {
+        content: '';
+        width: 8px; height: 8px;
+        border-radius: 50%; background: var(--green);
+        animation: pulse 1.6s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.5); }
+        50% { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
+      }
+
+      /* --- Content area --- */
+      .content { padding: 24px 32px 60px; }
+      .greet {
+        display: flex; align-items: end; justify-content: space-between;
+        gap: 16px; margin-bottom: 18px;
+      }
+      .greet h1 {
+        font-size: 24px;
+        margin: 0 0 4px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+      }
+      .greet .sub { color: var(--muted); font-size: 13.5px; }
+
+      /* --- Active Trip card --- */
+      .trip {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        margin-bottom: 16px;
+        overflow: hidden;
+        box-shadow: var(--shadow-md);
+      }
+      .trip-head {
+        padding: 14px 20px;
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 12px;
+        border-bottom: 1px solid var(--line);
+      }
+      .trip-head .left { display: flex; align-items: center; gap: 12px; }
+      .trip-head .ind {
+        width: 10px; height: 10px;
+        border-radius: 50%;
+        position: relative;
+      }
+      .trip-head .ind::after {
+        content: '';
+        position: absolute; inset: -4px;
+        border-radius: 50%;
+        animation: pulse-ring 1.6s ease-in-out infinite;
+      }
+      .trip-head .label { font-size: 11.5px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+      .trip-head .order-id { font-weight: 700; font-size: 14px; }
+      .trip-head .total {
+        font-weight: 800; font-size: 15px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* Stage colors — mutated via [data-stage] on .trip */
+      .trip[data-stage='enroute_to_merchant'] .ind { background: var(--amber); }
+      .trip[data-stage='enroute_to_merchant'] .ind::after { box-shadow: 0 0 0 0 rgba(245,158,11,0.6); }
+      .trip[data-stage='at_merchant'] .ind { background: var(--blue); }
+      .trip[data-stage='at_merchant'] .ind::after { box-shadow: 0 0 0 0 rgba(59,130,246,0.6); }
+      .trip[data-stage='enroute_to_customer'] .ind { background: var(--green); }
+      .trip[data-stage='enroute_to_customer'] .ind::after { box-shadow: 0 0 0 0 rgba(16,185,129,0.6); }
+
+      @keyframes pulse-ring {
+        0%, 100% { transform: scale(0.6); opacity: 0; }
+        50% { transform: scale(1); opacity: 1; }
+      }
+
+      /* Stage tabs */
+      .stage-tabs {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0;
+        background: var(--line-2);
+        padding: 4px;
+        margin: 14px 20px 0;
+        border-radius: 12px;
+      }
+      .stage-tab {
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        padding: 9px 12px;
+        background: transparent;
+        border: 0;
+        border-radius: 9px;
+        font-weight: 600; font-size: 12.5px;
+        color: var(--muted);
+        transition: background .12s, color .12s, box-shadow .12s;
+      }
+      .stage-tab[aria-selected='true'] {
+        background: var(--surface);
+        color: var(--ink);
+        box-shadow: var(--shadow-sm);
+      }
+      .stage-tab .stage-dot {
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        background: var(--muted-2);
+      }
+      .stage-tab[data-stage='enroute_to_merchant'][aria-selected='true'] .stage-dot { background: var(--amber); }
+      .stage-tab[data-stage='at_merchant'][aria-selected='true'] .stage-dot { background: var(--blue); }
+      .stage-tab[data-stage='enroute_to_customer'][aria-selected='true'] .stage-dot { background: var(--green); }
+
+      /* Pickup / dropoff details */
+      .trip-body {
+        padding: 18px 20px 20px;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 14px;
+        align-items: stretch;
+      }
+      .leg {
+        display: flex; gap: 12px; align-items: flex-start;
+      }
+      .leg .pin {
+        width: 32px; height: 32px;
+        border-radius: 10px;
+        flex-shrink: 0;
+        display: grid; place-items: center;
+        font-size: 14px;
+      }
+      .leg.pickup .pin { background: var(--amber-soft); color: #b45309; }
+      .leg.dropoff .pin { background: var(--green-soft); color: #047857; }
+      .leg .info { min-width: 0; flex: 1; }
+      .leg .role {
+        font-size: 11px;
+        color: var(--muted);
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .leg .name { font-weight: 700; font-size: 14.5px; margin-top: 1px; }
+      .leg .addr { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+      .leg .meta {
+        font-size: 12px;
+        color: var(--ink-2);
+        margin-top: 8px;
+        display: flex; gap: 10px; flex-wrap: wrap;
+      }
+      .leg .meta span { display: inline-flex; align-items: center; gap: 4px; }
+
+      .trip-arrow {
+        align-self: center;
+        color: var(--muted-2);
+      }
+
+      .trip-footer {
+        padding: 12px 20px;
+        background: var(--line-2);
+        font-size: 12.5px;
+        color: var(--muted);
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 10px;
+      }
+      .trip-footer strong { color: var(--ink); font-weight: 700; }
+      .trip-help {
+        background: var(--brand);
+        color: #fff;
+        font-weight: 700;
+        font-size: 12.5px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 0;
+      }
+      .trip-help:hover { background: var(--brand-dark); }
+
+      /* --- Stat cards --- */
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-bottom: 16px;
+      }
+      .stat {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 16px 18px;
+        position: relative;
+      }
+      .stat .label {
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+      .stat .value {
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+        color: var(--ink);
+        font-variant-numeric: tabular-nums;
+      }
+      .stat .trend {
+        margin-top: 4px;
+        display: inline-flex; align-items: center; gap: 4px;
+        font-size: 11.5px;
+        font-weight: 600;
+      }
+      .stat .trend.up { color: #047857; }
+
+      /* --- Two-col bottom layout --- */
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 16px;
+      }
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        overflow: hidden;
+      }
+      .panel-head {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--line);
+        display: flex; align-items: center; justify-content: space-between;
+      }
+      .panel-head h3 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 700;
+      }
+      .panel-head .link {
+        font-size: 12.5px; font-weight: 600; color: var(--brand);
+      }
+
+      /* --- Deliveries list --- */
+      .delivery-list { padding: 6px 0; }
+      .delivery {
+        display: grid;
+        grid-template-columns: 36px 1fr auto auto;
+        gap: 14px; align-items: center;
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--line-2);
+      }
+      .delivery:last-child { border-bottom: 0; }
+      .delivery .ic {
+        width: 36px; height: 36px;
+        border-radius: 10px;
+        background: var(--line-2);
+        display: grid; place-items: center;
+        font-size: 16px;
+      }
+      .delivery .info { min-width: 0; }
+      .delivery .from-to {
+        font-weight: 600; font-size: 13.5px;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+      .delivery .meta {
+        font-size: 12px; color: var(--muted);
+        margin-top: 2px;
+        display: flex; gap: 8px; align-items: center;
+      }
+      .delivery .amount { font-weight: 800; font-size: 14px; font-variant-numeric: tabular-nums; }
+      .delivery .status {
+        font-size: 11px; font-weight: 700;
+        padding: 3px 8px; border-radius: 999px;
+        text-transform: uppercase; letter-spacing: 0.04em;
+      }
+      .delivery .status.delivered { background: var(--green-soft); color: #047857; }
+      .delivery .status.cancelled { background: var(--brand-soft); color: var(--brand); }
+
+      /* --- Earnings chart --- */
+      .chart-wrap { padding: 18px 20px; }
+      .bars {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 8px;
+        height: 120px;
+        align-items: end;
+      }
+      .bar { display: flex; flex-direction: column; gap: 6px; align-items: center; height: 100%; }
+      .bar .col {
+        width: 100%;
+        background: linear-gradient(180deg, #ff4d63 0%, #d90217 100%);
+        border-radius: 6px 6px 0 0;
+        align-self: end;
+      }
+      .bar .col.muted { background: var(--line-2); }
+      .bar .day { font-size: 11px; color: var(--muted); font-weight: 600; }
+      .chart-summary {
+        display: flex; gap: 24px;
+        padding: 14px 20px;
+        border-top: 1px solid var(--line-2);
+      }
+      .chart-summary .k { font-size: 11.5px; color: var(--muted); font-weight: 600; }
+      .chart-summary .v { font-size: 17px; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+      /* --- Identity panel --- */
+      .ident {
+        padding: 16px 20px;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+      .ident .row { display: flex; flex-direction: column; gap: 2px; }
+      .ident .k { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+      .ident .v { font-weight: 600; font-size: 13px; }
+      .ident .v.ok { color: #047857; }
+      .ident .v.warn { color: #b45309; }
+
+      /* --- Demo banner --- */
+      .demo-banner {
+        background: var(--ink);
+        color: #fff;
+        padding: 8px 32px;
+        font-size: 12px;
+        display: flex; align-items: center; justify-content: center; gap: 10px;
+        font-weight: 600;
+      }
+      .demo-banner .dot {
+        width: 8px; height: 8px; border-radius: 50%;
+        background: var(--brand);
+        box-shadow: 0 0 0 4px rgba(217,2,23,0.2);
+      }
+
+      @media (max-width: 1100px) {
+        .stats { grid-template-columns: repeat(2, 1fr); }
+        .grid-2 { grid-template-columns: 1fr; }
+        .trip-body { grid-template-columns: 1fr; }
+        .trip-arrow { display: none; }
+      }
+      @media (max-width: 800px) {
+        .app { grid-template-columns: 1fr; }
+        .sidebar { position: static; height: auto; flex-direction: row; overflow-x: auto; padding: 12px; }
+        .nav-section { display: none; }
+        .sidebar .spacer, .rider-card { display: none; }
+        .stage-tabs { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="demo-banner" role="status" aria-live="polite">
+      <span class="dot" aria-hidden="true"></span>
+      <span>Snoonu Rider Portal — live demo with the OpenCX support widget embedded</span>
+    </div>
+
+    <div class="app">
+      <!-- ========== Sidebar ========== -->
+      <aside class="sidebar" aria-label="Primary navigation">
+        <a href="#" class="brand-logo" aria-label="Snoonu Rider Portal">
+          <svg width="36" height="36" viewBox="0 0 38 38" fill="none" aria-hidden="true">
+            <rect width="38" height="38" rx="11" fill="#D90217" />
+            <path d="M25.6 13.6c-1.3-1.6-3.4-2.6-6.2-2.6-4.2 0-7 2.1-7 5.2 0 2.6 1.8 4.1 5.6 4.9l2.6.6c2.3.5 3 .9 3 1.9 0 1.2-1.3 2-3.4 2-2.2 0-3.6-.8-4.6-2.4l-3.2 1.9c1.3 2.4 4 3.9 7.6 3.9 4.6 0 7.6-2.2 7.6-5.5 0-2.7-1.8-4.2-5.8-5l-2.6-.5c-2-.4-2.7-.9-2.7-1.8 0-1.1 1.2-1.8 3.1-1.8 2 0 3.3.7 4.2 2l3-1.8z" fill="#fff"/>
+          </svg>
+          <div class="label-stack">
+            <svg width="100" height="24" viewBox="0 0 120 30" fill="none" aria-hidden="true">
+              <text x="0" y="23" font-family="Inter, sans-serif" font-size="26" font-weight="900" font-style="italic" fill="#D90217" letter-spacing="-0.5">snoonu</text>
+            </svg>
+            <span class="portal">Rider Portal</span>
+          </div>
+        </a>
+
+        <div class="nav-section">Workspace</div>
+        <a href="#" class="nav-item active">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+          Dashboard
+        </a>
+        <a href="#" class="nav-item">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M21 3l-7 7"/><path d="M8 21H3v-5"/><path d="M3 21l7-7"/></svg>
+          Active orders
+          <span class="badge">1</span>
+        </a>
+        <a href="#" class="nav-item">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Earnings
+        </a>
+        <a href="#" class="nav-item">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Schedule
+        </a>
+        <a href="#" class="nav-item">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Documents
+        </a>
+        <a href="#" class="nav-item">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Performance
+        </a>
+
+        <div class="nav-section">Account</div>
+        <a href="#" class="nav-item">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Profile
+        </a>
+        <a href="#" class="nav-item">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12" y2="17"/></svg>
+          Help &amp; support
+        </a>
+
+        <div class="spacer"></div>
+
+        <div class="rider-card">
+          <div class="avatar">BH</div>
+          <div class="stack">
+            <span class="name">Bilal Hasan</span>
+            <span class="id">Rider · #39612</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- ========== Main ========== -->
+      <main class="main">
+        <header class="topbar">
+          <div class="left">
+            <div class="breadcrumb">
+              <span>Rider Portal</span>
+              <span>›</span>
+              <span class="here">Dashboard</span>
+            </div>
+          </div>
+          <div class="right">
+            <button class="online-toggle" type="button" aria-pressed="true">
+              <span class="pulse" aria-hidden="true"></span>
+              Online
+            </button>
+            <button class="iconbtn" aria-label="Notifications">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              <span class="dot" aria-hidden="true"></span>
+            </button>
+            <button class="iconbtn" aria-label="Settings">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </button>
+          </div>
+        </header>
+
+        <div class="content">
+          <div class="greet">
+            <div>
+              <h1>Good afternoon, Bilal 👋</h1>
+              <div class="sub">You have 1 active delivery. Toggle the trip stage below to demo each support flow.</div>
+            </div>
+          </div>
+
+          <!-- ========== Active Trip card (drives the widget) ========== -->
+          <section class="trip" id="trip" data-stage="enroute_to_merchant" aria-label="Active trip">
+            <div class="trip-head">
+              <div class="left">
+                <span class="ind" aria-hidden="true"></span>
+                <div>
+                  <div class="label" id="trip-stage-label">On the way to merchant</div>
+                  <div class="order-id">Order #OD-2841 · 3 items</div>
+                </div>
+              </div>
+              <div class="total">QR 47.50</div>
+            </div>
+
+            <div class="stage-tabs" role="tablist" aria-label="Trip stage (demo control)">
+              <button class="stage-tab" type="button" role="tab" data-stage="enroute_to_merchant" aria-selected="true">
+                <span class="stage-dot" aria-hidden="true"></span> On the way to merchant
+              </button>
+              <button class="stage-tab" type="button" role="tab" data-stage="at_merchant" aria-selected="false">
+                <span class="stage-dot" aria-hidden="true"></span> At merchant
+              </button>
+              <button class="stage-tab" type="button" role="tab" data-stage="enroute_to_customer" aria-selected="false">
+                <span class="stage-dot" aria-hidden="true"></span> On the way to customer
+              </button>
+            </div>
+
+            <div class="trip-body">
+              <div class="leg pickup">
+                <div class="pin">📦</div>
+                <div class="info">
+                  <div class="role">Pickup</div>
+                  <div class="name">Open Test Supplier</div>
+                  <div class="addr">123 Bin Mahmud, Doha</div>
+                  <div class="meta">
+                    <span>📞 +974 1234 5678</span>
+                    <span>· Supplier #294</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="trip-arrow" aria-hidden="true">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </div>
+
+              <div class="leg dropoff">
+                <div class="pin">🏁</div>
+                <div class="info">
+                  <div class="role">Dropoff</div>
+                  <div class="name">Customer · Bin Mahmud</div>
+                  <div class="addr">Building 14, Street 22</div>
+                  <div class="meta">
+                    <span id="trip-eta">⏱ ETA 14:42 · 8 min</span>
+                    <span>· 1.2 km</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="trip-footer">
+              <span><strong id="trip-footer-stage">Heading to pickup</strong> · Need help with this trip?</span>
+              <button class="trip-help" type="button" id="trip-help-btn">Open support chat</button>
+            </div>
+          </section>
+
+          <!-- Stat cards -->
+          <section class="stats" aria-label="Today at a glance">
+            <div class="stat">
+              <div class="label">Today's earnings</div>
+              <div class="value">QR 247.50</div>
+              <span class="trend up">▲ 14% vs. yesterday</span>
+            </div>
+            <div class="stat">
+              <div class="label">Trips completed</div>
+              <div class="value">18</div>
+              <span class="trend up">▲ 3 vs. yesterday</span>
+            </div>
+            <div class="stat">
+              <div class="label">Hours online</div>
+              <div class="value">6h 24m</div>
+              <span class="trend up">On track for 8h goal</span>
+            </div>
+            <div class="stat">
+              <div class="label">Acceptance rate</div>
+              <div class="value">94%</div>
+              <span class="trend up">★ 4.9 rider rating</span>
+            </div>
+          </section>
+
+          <section class="grid-2">
+            <div class="panel">
+              <div class="panel-head">
+                <h3>Recent deliveries</h3>
+                <a href="#" class="link">View all →</a>
+              </div>
+              <div class="delivery-list">
+                <div class="delivery">
+                  <div class="ic">📦</div>
+                  <div class="info">
+                    <div class="from-to">Open Test Supplier → Bin Mahmud</div>
+                    <div class="meta"><span>14:22</span><span>·</span><span>3.2 km</span><span>·</span><span>Customer rating ★ 5</span></div>
+                  </div>
+                  <div class="amount">QR 12.50</div>
+                  <span class="status delivered">Delivered</span>
+                </div>
+                <div class="delivery">
+                  <div class="ic">☕</div>
+                  <div class="info">
+                    <div class="from-to">Arabica → West Bay</div>
+                    <div class="meta"><span>13:48</span><span>·</span><span>4.1 km</span><span>·</span><span>Customer rating ★ 5</span></div>
+                  </div>
+                  <div class="amount">QR 14.00</div>
+                  <span class="status delivered">Delivered</span>
+                </div>
+                <div class="delivery">
+                  <div class="ic">🛒</div>
+                  <div class="info">
+                    <div class="from-to">LuLu Hypermarket → Pearl Qatar</div>
+                    <div class="meta"><span>13:05</span><span>·</span><span>5.8 km</span><span>·</span><span>Customer rating ★ 4</span></div>
+                  </div>
+                  <div class="amount">QR 18.75</div>
+                  <span class="status delivered">Delivered</span>
+                </div>
+                <div class="delivery">
+                  <div class="ic">🍔</div>
+                  <div class="info">
+                    <div class="from-to">PRYM → Lusail Marina</div>
+                    <div class="meta"><span>12:31</span><span>·</span><span>6.4 km</span><span>·</span><span>Customer rating ★ 5</span></div>
+                  </div>
+                  <div class="amount">QR 16.25</div>
+                  <span class="status delivered">Delivered</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: grid; gap: 16px;">
+              <div class="panel">
+                <div class="panel-head">
+                  <h3>This week</h3>
+                  <a href="#" class="link">Earnings →</a>
+                </div>
+                <div class="chart-wrap">
+                  <div class="bars" aria-label="Daily earnings this week">
+                    <div class="bar"><div class="col" style="height: 55%"></div><div class="day">Mon</div></div>
+                    <div class="bar"><div class="col" style="height: 72%"></div><div class="day">Tue</div></div>
+                    <div class="bar"><div class="col" style="height: 48%"></div><div class="day">Wed</div></div>
+                    <div class="bar"><div class="col" style="height: 88%"></div><div class="day">Thu</div></div>
+                    <div class="bar"><div class="col" style="height: 65%"></div><div class="day">Fri</div></div>
+                    <div class="bar"><div class="col" style="height: 78%"></div><div class="day">Sat</div></div>
+                    <div class="bar"><div class="col muted" style="height: 30%"></div><div class="day">Sun</div></div>
+                  </div>
+                </div>
+                <div class="chart-summary">
+                  <div>
+                    <div class="k">Week to date</div>
+                    <div class="v">QR 1,438.25</div>
+                  </div>
+                  <div>
+                    <div class="k">Next payout</div>
+                    <div class="v">Sun, 17 May</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel">
+                <div class="panel-head">
+                  <h3>Documents &amp; identity</h3>
+                  <a href="#" class="link">Manage →</a>
+                </div>
+                <div class="ident">
+                  <div class="row">
+                    <span class="k">Qatar ID</span>
+                    <span class="v warn">1234556 · expires 10 Jul 2026</span>
+                  </div>
+                  <div class="row">
+                    <span class="k">Passport</span>
+                    <span class="v ok">AA12345 · expires 25 May 2028</span>
+                  </div>
+                  <div class="row">
+                    <span class="k">Driving licence</span>
+                    <span class="v ok">Valid until 03 May 2030</span>
+                  </div>
+                  <div class="row">
+                    <span class="k">Work permit</span>
+                    <span class="v ok">Valid until 04 May 2028</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <!-- ============ OpenCX widget — stage-aware, rider+merchant context ============ -->
+    <script defer src="https://unpkg.com/@opencx/widget@latest/dist-embed/script.js"></script>
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        // ---- Static data: rider + supplier directory -----------------------
+        const rider = {
+          public_id: '39612',
+          full_name: 'Bilal Hasan',
+          email: 'aziz+falconflextest@open.cx',
+          phone_number: '+97412346778',
+          transport_type: 'bike',
+          employment_status: 'active',
+          availability_type: 'Unavailable',
+          qatar_id: '1234556',
+          qatar_id_expiration_date: '2026-07-10',
+          passport_no: 'AA12345',
+          passport_expiration_date: '2028-05-25',
+          driving_license_expiration_date: '2030-05-03',
+          work_permit_expiration_date: '2028-05-04',
+          joining_date: '2026-04-06',
+        };
+
+        const suppliers = [
+          {
+            short_id: '294',
+            name: 'Open Test Supplier',
+            address: '123 Bin Mahmud, Doha',
+            contact_number: '+97412345678',
+            total_agents: 1,
+            active_agents: 1,
+            blocked_agents: 0,
+            expired_agents_count: 0,
+            expire_soon_agents_count: 0,
+          },
+        ];
+
+        // ---- Active trip (stage drives the widget config) ------------------
+        const activeTrip = {
+          trip_id: 'TR-39612-2841',
+          order_id: 'OD-2841',
+          merchant: suppliers[0],
+          customer: {
+            area: 'Bin Mahmud',
+            address: 'Building 14, Street 22',
+            distance_km: 1.2,
+            eta_min: 8,
+          },
+          order: { items: 3, total_qr: 47.5 },
+        };
+
+        // L1 reason for contact is *implicit* in the stage. AI infers from context.
+        // L2 reasons are the documented Snoonu × OpenCX workflows (4 today):
+        //   F1 Vehicle Issue, F2 Unable to find merchant, F3 Chained order removal,
+        //   F4 Vehicle change request. Each L2 is shown only at stages where it
+        //   makes sense, plus a free-text "Something else" fallback.
+        const DOCUMENTED_WORKFLOWS = {
+          F1_vehicle_issue: {
+            id: 'F1',
+            name: 'Vehicle Issue',
+            rider_label: 'My bike has a problem / vehicle issue',
+            summary:
+              'Driver reports vehicle problem. Count vehicle-issue removals: >5 in 7d OR >1 same-day → remove order, block driver, notify supply. Otherwise release and let FF auto-reassign.',
+            ff_endpoints: [
+              'GET /api/v1/tasks/tasksbyagentphonenumber',
+              'POST /api/v1/onlinetrip/releasetasksfromtrip (employmentStatusId=2 or autoAssignmentConfig.autoAssignment=true)',
+            ],
+            applies_to_stages: ['enroute_to_merchant', 'at_merchant', 'enroute_to_customer'],
+          },
+          F2_cant_find_merchant: {
+            id: 'F2',
+            name: 'Unable to find merchant location',
+            rider_label: "I can't find the merchant",
+            summary:
+              'Send branch phone (from task pickup data) to driver. After 5 minutes, if not arrived, fall back to Waze routing.',
+            ff_endpoints: [
+              'GET /api/v1/tasks/tasksbyagentphonenumber → tasks[].pickup.{phoneNumber,address,latitude,longitude,notes}',
+            ],
+            applies_to_stages: ['enroute_to_merchant'],
+          },
+          F3_chained_order_removal: {
+            id: 'F3',
+            name: 'Chained order removal',
+            rider_label: 'Drop one order from this chain',
+            summary:
+              'Remove one order from a multi-order chain without breaking the rest. FF auto-recomputes the remaining trip after release.',
+            ff_endpoints: [
+              'GET /api/v1/tasks/tasksbyagentphonenumber → onlineTrip.tripSteps[]',
+              'POST /api/v1/onlinetrip/releasetasksfromtrip (TaskIds:[<one>])',
+            ],
+            applies_to_stages: ['enroute_to_merchant', 'at_merchant', 'enroute_to_customer'],
+          },
+          F4_vehicle_change: {
+            id: 'F4',
+            name: 'Vehicle change request',
+            rider_label: 'I need to switch to car for this order',
+            summary:
+              'Bike rider asks to switch. Branch on vertical, item count, order value. If rules decide → release Bike + re-dispatch as Car (transportTypeId=4). Otherwise escalate to ROPS Slack.',
+            ff_endpoints: [
+              'GET /api/v1/agents?Id=<agentId>',
+              'GET /api/v1/tasks/get?Id=<orderId>',
+              'POST /api/v1/onlinetrip/releasetasksfromtrip (transportTypeId=4)',
+            ],
+            applies_to_stages: ['enroute_to_merchant', 'at_merchant'],
+          },
+        };
+
+        // Build the rider-facing L2 list per stage from the documented workflows above.
+        function l2QuestionsForStage(stage) {
+          const list = Object.values(DOCUMENTED_WORKFLOWS)
+            .filter((w) => w.applies_to_stages.includes(stage))
+            .map((w) => w.rider_label);
+          list.push('Something else');
+          return list;
+        }
+
+        const STAGES = {
+          enroute_to_merchant: {
+            label: 'On the way to merchant',
+            footer: 'Heading to pickup',
+            l1_reason: 'pickup_in_progress',
+            banner:
+              "Looks like you're on your way to Open Test Supplier — 3 min away. Need help with the pickup?",
+            questions: l2QuestionsForStage('enroute_to_merchant'),
+          },
+          at_merchant: {
+            label: 'At merchant — picking up',
+            footer: 'At pickup',
+            l1_reason: 'at_merchant',
+            banner:
+              "You're at Open Test Supplier. Anything wrong with the pickup?",
+            questions: l2QuestionsForStage('at_merchant'),
+          },
+          enroute_to_customer: {
+            label: 'On the way to customer',
+            footer: 'Heading to dropoff',
+            l1_reason: 'delivery_in_progress',
+            banner:
+              "Delivering to Bin Mahmud — 8 min ETA. Need a hand on the way?",
+            questions: l2QuestionsForStage('enroute_to_customer'),
+          },
+        };
+
+        // ---- Branding (inline SVG, no external deps) -----------------------
+        const sMarkAvatar =
+          'data:image/svg+xml;utf8,' +
+          encodeURIComponent(
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38 38">' +
+              '<rect width="38" height="38" rx="11" fill="#D90217"/>' +
+              '<path d="M25.6 13.6c-1.3-1.6-3.4-2.6-6.2-2.6-4.2 0-7 2.1-7 5.2 0 2.6 1.8 4.1 5.6 4.9l2.6.6c2.3.5 3 .9 3 1.9 0 1.2-1.3 2-3.4 2-2.2 0-3.6-.8-4.6-2.4l-3.2 1.9c1.3 2.4 4 3.9 7.6 3.9 4.6 0 7.6-2.2 7.6-5.5 0-2.7-1.8-4.2-5.8-5l-2.6-.5c-2-.4-2.7-.9-2.7-1.8 0-1.1 1.2-1.8 3.1-1.8 2 0 3.3.7 4.2 2l3-1.8z" fill="#fff"/>' +
+            '</svg>',
+          );
+        const wordmarkLogo =
+          'data:image/svg+xml;utf8,' +
+          encodeURIComponent(
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 50">' +
+              '<text x="0" y="36" font-family="Inter, sans-serif" font-size="36" font-weight="900" font-style="italic" fill="#D90217" letter-spacing="-0.7">snoonu</text>' +
+              '<text x="0" y="48" font-family="Inter, sans-serif" font-size="9" font-weight="700" fill="#6b6b73" letter-spacing="1.2">RIDER PORTAL</text>' +
+            '</svg>',
+          );
+
+        // ---- Stage state machine -------------------------------------------
+        let currentStage = 'enroute_to_merchant';
+
+        function buildOptions(stage) {
+          const cfg = STAGES[stage];
+          return {
+            token: 'fa8e14f2163a82dea05f75d46a53100d',
+            language: 'en',
+
+            bot: { name: 'Snoo', avatarUrl: sMarkAvatar },
+            assets: { organizationLogo: wordmarkLogo },
+
+            theme: {
+              palette: 'neutral',
+              primaryColor: '#D90217',
+              widgetTrigger: {
+                size: { button: 60, icon: 26 },
+                offset: { bottom: 24, right: 24 },
+              },
+              widgetContentContainer: {
+                borderRadius: '20px',
+                boxShadow: '0 20px 50px rgba(217, 2, 23, 0.18)',
+              },
+            },
+
+            user: {
+              externalId: rider.public_id,
+              data: {
+                name: rider.full_name,
+                email: rider.email,
+                customData: {
+                  role: 'rider',
+                  public_id: rider.public_id,
+                  phone_number: rider.phone_number,
+                  transport_type: rider.transport_type,
+                  employment_status: rider.employment_status,
+                  availability_type: rider.availability_type,
+                  qatar_id: rider.qatar_id,
+                  qatar_id_expiration_date: rider.qatar_id_expiration_date,
+                  passport_no: rider.passport_no,
+                  passport_expiration_date: rider.passport_expiration_date,
+                  driving_license_expiration_date: rider.driving_license_expiration_date,
+                  work_permit_expiration_date: rider.work_permit_expiration_date,
+                  joining_date: rider.joining_date,
+                },
+              },
+            },
+
+            // Per-message context — AI sees the rider's live trip stage on every reply.
+            context: {
+              page: { name: 'Rider Portal · Dashboard' },
+              rider_profile: rider,
+              suppliers: suppliers,
+              current_trip: {
+                ...activeTrip,
+                stage: stage,
+                l1_reason: cfg.l1_reason,
+              },
+              // Documented L2 workflows the AI is expected to follow when these
+              // scenarios come up. Sourced from the Snoonu × OpenCX API mapping doc.
+              documented_workflows: Object.values(DOCUMENTED_WORKFLOWS).map((w) => ({
+                id: w.id,
+                name: w.name,
+                summary: w.summary,
+                ff_endpoints: w.ff_endpoints,
+                applies_to_stages: w.applies_to_stages,
+              })),
+            },
+
+            sessionCustomData: {
+              channel: 'rider_portal',
+              rider_public_id: rider.public_id,
+              trip_id: activeTrip.trip_id,
+              trip_stage: stage,
+              l1_reason: cfg.l1_reason,
+            },
+
+            messageCustomData: {
+              platform: 'web',
+              surface: 'rider-portal',
+              app_version: '1.0.0-demo',
+              trip_stage: stage,
+            },
+
+            // Persistent banner pinned at the top of the chat — stage-specific.
+            advancedInitialMessages: [
+              {
+                message: cfg.banner,
+                persistent: true,
+              },
+            ],
+
+            initialQuestions: cfg.questions,
+            initialQuestionsPosition: 'below-initial-messages',
+          };
+        }
+
+        // ---- DOM updates on stage change -----------------------------------
+        const tripEl = document.getElementById('trip');
+        const tabEls = document.querySelectorAll('.stage-tab');
+        const stageLabelEl = document.getElementById('trip-stage-label');
+        const footerStageEl = document.getElementById('trip-footer-stage');
+        const helpBtn = document.getElementById('trip-help-btn');
+
+        function applyStage(stage) {
+          if (!STAGES[stage]) return;
+          currentStage = stage;
+          const cfg = STAGES[stage];
+
+          tripEl.setAttribute('data-stage', stage);
+          stageLabelEl.textContent = cfg.label;
+          footerStageEl.textContent = cfg.footer;
+          tabEls.forEach((t) => {
+            t.setAttribute(
+              'aria-selected',
+              t.getAttribute('data-stage') === stage ? 'true' : 'false',
+            );
+          });
+
+          // Re-init the widget so the banner + questions + context update.
+          if (typeof window.initOpenScript === 'function') {
+            try {
+              window.initOpenScript(buildOptions(stage));
+            } catch (e) {
+              console.error('Widget re-init failed', e);
+            }
+          }
+        }
+
+        tabEls.forEach((t) => {
+          t.addEventListener('click', () => applyStage(t.getAttribute('data-stage')));
+        });
+
+        helpBtn.addEventListener('click', () => {
+          // Open the widget by re-initialising with isOpen.
+          try {
+            window.initOpenScript({ ...buildOptions(currentStage), isOpen: true });
+          } catch (e) {
+            console.error('Widget open failed', e);
+          }
+        });
+
+        // ---- Initial mount --------------------------------------------------
+        // Wait for the embed bundle to define initOpenScript, then mount.
+        function mountWhenReady() {
+          if (typeof window.initOpenScript === 'function') {
+            window.initOpenScript(buildOptions(currentStage));
+          } else {
+            setTimeout(mountWhenReady, 100);
+          }
+        }
+        mountWhenReady();
+      });
+    </script>
+  </body>
+</html>
