@@ -1036,68 +1036,27 @@
               data: {
                 name: rider.full_name,
                 email: rider.email,
+                // Slim customData: only the values that CANNOT be fetched from
+                // FalconFlex actions. Everything else (profile, documents, supplier,
+                // trip details) the AI pulls live via falconflex_* actions on demand.
+                // This avoids stale snapshots and forces the AI to exercise the real
+                // endpoints — closer to production behaviour.
                 customData: {
                   role: 'rider',
-                  // Snoonu-facing
-                  public_id: rider.public_id,
-                  phone_number: rider.phone_number,
-                  transport_type: rider.transport_type,
-                  employment_status: rider.employment_status,
-                  availability_type: rider.availability_type,
-                  // FalconFlex internal IDs — let the AI skip lookups and call
-                  // /agents, /tasks, /agentAccount/* directly with these.
                   falconflex_agent_id: rider.falconflex_agent_id,
-                  falconflex_user_id: rider.falconflex_user_id,
-                  falconflex_company_id: rider.falconflex_company_id,
-                  fleet_type_id: rider.fleet_type_id,
-                  transport_type_id: rider.transport_type_id,
-                  employment_status_id: rider.employment_status_id,
-                  availability_type_id: rider.availability_type_id,
-                  // Documents (for ID verification, expiry checks, etc.)
-                  qatar_id: rider.qatar_id,
-                  qatar_id_expiration_date: rider.qatar_id_expiration_date,
-                  passport_no: rider.passport_no,
-                  passport_expiration_date: rider.passport_expiration_date,
-                  driving_license_expiration_date: rider.driving_license_expiration_date,
-                  work_permit_expiration_date: rider.work_permit_expiration_date,
-                  joining_date: rider.joining_date,
-                  // Active trip — so even the first chat message has full context
-                  active_trip_order_id: activeTrip.order_id,
                   active_trip_falconflex_task_id: activeTrip.falconflex_task_id,
-                  active_trip_falconflex_task_short_id: activeTrip.falconflex_task_short_id,
-                  active_supplier_contract_id: suppliers[0].falconflex_supplier_contract_id,
+                  active_trip_order_id: activeTrip.order_id,
                 },
               },
             },
 
-            // Per-message context — AI sees the rider's live trip stage on every reply.
+            // Per-message context — only UI state the AI can't infer from the FF API.
             context: {
               page: { name: 'Rider Portal · Dashboard' },
-              rider_profile: rider,
-              suppliers: suppliers,
-              current_trip: {
-                ...activeTrip,
-                stage: stage,
-                l1_reason: cfg.l1_reason,
-              },
-              // Documented L2 workflows the AI is expected to follow when these
-              // scenarios come up. Sourced from the Snoonu × OpenCX API mapping doc.
-              documented_workflows: Object.values(DOCUMENTED_WORKFLOWS).map((w) => ({
-                id: w.id,
-                name: w.name,
-                summary: w.summary,
-                ff_endpoints: w.ff_endpoints,
-                applies_to_stages: w.applies_to_stages,
-              })),
             },
 
             sessionCustomData: {
               channel: 'rider_portal',
-              rider_public_id: rider.public_id,
-              falconflex_agent_id: rider.falconflex_agent_id,
-              trip_id: activeTrip.trip_id,
-              order_id: activeTrip.order_id,
-              falconflex_task_id: activeTrip.falconflex_task_id,
               trip_stage: stage,
               l1_reason: cfg.l1_reason,
             },
