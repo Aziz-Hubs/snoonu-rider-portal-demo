@@ -883,8 +883,8 @@
         const activeTrip = {
           trip_id: 'TR-39612-2841',
           order_id: 'OD-2841',                         // Snoonu external order #
-          falconflex_task_id: '6a09c343de5429bf8dcb9e30',
-          falconflex_task_short_id: 'BLdsBzeQ',
+          falconflex_task_id: '6a09f78a292fffcf89442ca5',
+          falconflex_task_short_id: 'U844VvCC',
           merchant: suppliers[0],
           pickup_eta_min: 3,
           customer: {
@@ -961,14 +961,13 @@
           return list;
         }
 
-        const firstName = (rider.full_name || 'there').split(' ')[0];
         const STAGES = {
           enroute_to_merchant: {
             label: 'On the way to merchant',
             footer: 'Heading to pickup',
             l1_reason: 'pickup_in_progress',
             banner:
-              `Hi ${firstName} 👋  I see you're on order *${activeTrip.order_id}* heading to *${activeTrip.merchant.name}* — about ${activeTrip.pickup_eta_min} min away. What do you need help with?`,
+              `Hi 👋  I'm Snoo, your rider support assistant. What can I help you with on your current trip?`,
             questions: l2QuestionsForStage('enroute_to_merchant'),
           },
           at_merchant: {
@@ -976,7 +975,7 @@
             footer: 'At pickup',
             l1_reason: 'at_merchant',
             banner:
-              `Hi ${firstName} 👋  You're at *${activeTrip.merchant.name}* picking up order *${activeTrip.order_id}*. Anything wrong with the pickup?`,
+              `Hi 👋  I'm Snoo, your rider support assistant. What can I help you with on your current trip?`,
             questions: l2QuestionsForStage('at_merchant'),
           },
           enroute_to_customer: {
@@ -984,7 +983,7 @@
             footer: 'Heading to dropoff',
             l1_reason: 'delivery_in_progress',
             banner:
-              `Hi ${firstName} 👋  You're delivering order *${activeTrip.order_id}* to *${activeTrip.customer.area}* — ${activeTrip.customer.eta_min} min ETA. Need a hand on the way?`,
+              `Hi 👋  I'm Snoo, your rider support assistant. What can I help you with on your current trip?`,
             questions: l2QuestionsForStage('enroute_to_customer'),
           },
         };
