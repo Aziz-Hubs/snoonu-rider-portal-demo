@@ -886,6 +886,7 @@
           falconflex_task_id: '6a0975c1c022ced0f45e9550',
           falconflex_task_short_id: 'Xrn4ttxQ',
           merchant: suppliers[0],
+          pickup_eta_min: 3,
           customer: {
             area: 'Bin Mahmud',
             address: 'Building 14, Street 22',
@@ -966,7 +967,7 @@
             footer: 'Heading to pickup',
             l1_reason: 'pickup_in_progress',
             banner:
-              "Looks like you're on your way to Open Test Supplier — 3 min away. Need help with the pickup?",
+              `Looks like you're on your way to ${activeTrip.merchant.name} — ${activeTrip.pickup_eta_min} min away. Need help with the pickup?`,
             questions: l2QuestionsForStage('enroute_to_merchant'),
           },
           at_merchant: {
@@ -974,7 +975,7 @@
             footer: 'At pickup',
             l1_reason: 'at_merchant',
             banner:
-              "You're at Open Test Supplier. Anything wrong with the pickup?",
+              `You're at ${activeTrip.merchant.name}. Anything wrong with the pickup?`,
             questions: l2QuestionsForStage('at_merchant'),
           },
           enroute_to_customer: {
@@ -982,7 +983,7 @@
             footer: 'Heading to dropoff',
             l1_reason: 'delivery_in_progress',
             banner:
-              "Delivering to Bin Mahmud — 8 min ETA. Need a hand on the way?",
+              `Delivering to ${activeTrip.customer.area} — ${activeTrip.customer.eta_min} min ETA. Need a hand on the way?`,
             questions: l2QuestionsForStage('enroute_to_customer'),
           },
         };
