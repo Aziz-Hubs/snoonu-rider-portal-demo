@@ -50,7 +50,7 @@ Each action's `api_endpoint` is `https://webhook.site/<UUID>/api/v1/...`. The pa
 **Response (current default):**
 ```json
 {
-  "taskId": "6a0975c1c022ced0f45e9550",
+  "taskId": "6a099c9bde5429bf8d9f9e2d",
   "vertical": "FOOD"
 }
 ```
