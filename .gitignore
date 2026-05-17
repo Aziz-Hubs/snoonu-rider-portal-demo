@@ -4,3 +4,8 @@ node_modules/
 *.log
 .env
 .env.local
+.vercel
+.env*.local
+# build artifacts (vercel buildCommand copies index.html into public/ at build time)
+public/index.html
+package-lock.json
