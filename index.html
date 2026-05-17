@@ -961,13 +961,14 @@
           return list;
         }
 
+        const firstName = (rider.full_name || 'there').split(' ')[0];
         const STAGES = {
           enroute_to_merchant: {
             label: 'On the way to merchant',
             footer: 'Heading to pickup',
             l1_reason: 'pickup_in_progress',
             banner:
-              `Looks like you're on your way to ${activeTrip.merchant.name} — ${activeTrip.pickup_eta_min} min away. Need help with the pickup?`,
+              `Hi ${firstName} 👋  I see you're on order *${activeTrip.order_id}* heading to *${activeTrip.merchant.name}* — about ${activeTrip.pickup_eta_min} min away. What do you need help with?`,
             questions: l2QuestionsForStage('enroute_to_merchant'),
           },
           at_merchant: {
@@ -975,7 +976,7 @@
             footer: 'At pickup',
             l1_reason: 'at_merchant',
             banner:
-              `You're at ${activeTrip.merchant.name}. Anything wrong with the pickup?`,
+              `Hi ${firstName} 👋  You're at *${activeTrip.merchant.name}* picking up order *${activeTrip.order_id}*. Anything wrong with the pickup?`,
             questions: l2QuestionsForStage('at_merchant'),
           },
           enroute_to_customer: {
@@ -983,7 +984,7 @@
             footer: 'Heading to dropoff',
             l1_reason: 'delivery_in_progress',
             banner:
-              `Delivering to ${activeTrip.customer.area} — ${activeTrip.customer.eta_min} min ETA. Need a hand on the way?`,
+              `Hi ${firstName} 👋  You're delivering order *${activeTrip.order_id}* to *${activeTrip.customer.area}* — ${activeTrip.customer.eta_min} min ETA. Need a hand on the way?`,
             questions: l2QuestionsForStage('enroute_to_customer'),
           },
         };
@@ -1036,16 +1037,11 @@
               data: {
                 name: rider.full_name,
                 email: rider.email,
-                // Slim customData: only the values that CANNOT be fetched from
-                // FalconFlex actions. Everything else (profile, documents, supplier,
-                // trip details) the AI pulls live via falconflex_* actions on demand.
-                // This avoids stale snapshots and forces the AI to exercise the real
-                // endpoints — closer to production behaviour.
+                // CONTACT attributes (identity, long-lived — persist across sessions).
                 customData: {
                   role: 'rider',
                   falconflex_agent_id: rider.falconflex_agent_id,
-                  active_trip_falconflex_task_id: activeTrip.falconflex_task_id,
-                  active_trip_order_id: activeTrip.order_id,
+                  snoonu_public_id: rider.public_id,
                 },
               },
             },
@@ -1055,10 +1051,14 @@
               page: { name: 'Rider Portal · Dashboard' },
             },
 
+            // SESSION attributes (per-trip — change every session as orders rotate).
             sessionCustomData: {
               channel: 'rider_portal',
               trip_stage: stage,
               l1_reason: cfg.l1_reason,
+              active_trip_falconflex_task_id: activeTrip.falconflex_task_id,
+              active_trip_falconflex_task_short_id: activeTrip.falconflex_task_short_id,
+              active_trip_order_id: activeTrip.order_id,
             },
 
             messageCustomData: {
