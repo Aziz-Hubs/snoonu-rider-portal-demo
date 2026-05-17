@@ -817,14 +817,32 @@
     <script>
       window.addEventListener('DOMContentLoaded', () => {
         // ---- Static data: rider + supplier directory -----------------------
+        // All values match the FalconFlex staging tenant so the AI can call
+        // /agents, /tasks, etc. with the real internal IDs and get live data back.
         const rider = {
+          // Snoonu-facing identity (what riders see)
           public_id: '39612',
           full_name: 'Bilal Hasan',
           email: 'aziz+falconflextest@open.cx',
           phone_number: '+97412346778',
+
+          // FalconFlex internal identifiers (what the AI's tool calls need)
+          falconflex_agent_id: '69fc6e0e006cade1b37697e7',
+          falconflex_user_id: '9f2cef36-aed8-4631-bc9e-87cdec0415e7',
+          falconflex_company_id: '69f0ae329a419b548fe0545b',
+
+          // FleetType + Transport + Status enums (numeric IDs FF expects)
+          fleet_type_id: 2,                // 2 = FullTime
+          transport_type_id: 2,            // 2 = Bike
+          employment_status_id: 1,         // 1 = Active
+          availability_type_id: 3,         // 3 = Unavailable
+
+          // Human-readable mirrors
           transport_type: 'bike',
           employment_status: 'active',
           availability_type: 'Unavailable',
+
+          // Documents
           qatar_id: '1234556',
           qatar_id_expiration_date: '2026-07-10',
           passport_no: 'AA12345',
@@ -836,10 +854,19 @@
 
         const suppliers = [
           {
+            // Snoonu-side ID (from supplier CSV)
             short_id: '294',
             name: 'Open Test Supplier',
             address: '123 Bin Mahmud, Doha',
             contact_number: '+97412345678',
+
+            // FalconFlex SupplierContract IDs (needed by the AI to call FF cleanly)
+            falconflex_supplier_contract_id: '69fc6c87141f14074e5824dd',
+            falconflex_supplier_contract_short_id: '1168',
+            falconflex_contract_id: '69fc6c87141f14074e5824e2',
+            contract_name: 'Open Test Contract',
+
+            // Roster snapshot
             total_agents: 1,
             active_agents: 1,
             blocked_agents: 0,
@@ -849,9 +876,15 @@
         ];
 
         // ---- Active trip (stage drives the widget config) ------------------
+        // The FF task `falconflex_task_id` below is a real, active task in the
+        // staging tenant — the AI can call falconflex_get_task with this Id
+        // directly. The Snoonu-facing `order_id` lives on that task as the
+        // UserMetaData key `OrderId_External` for search-by-external-id flows.
         const activeTrip = {
           trip_id: 'TR-39612-2841',
-          order_id: 'OD-2841',
+          order_id: 'OD-2841',                         // Snoonu external order #
+          falconflex_task_id: '6a0975c1c022ced0f45e9550',
+          falconflex_task_short_id: 'Xrn4ttxQ',
           merchant: suppliers[0],
           customer: {
             area: 'Bin Mahmud',
@@ -859,7 +892,7 @@
             distance_km: 1.2,
             eta_min: 8,
           },
-          order: { items: 3, total_qr: 47.5 },
+          order: { items: 3, total_qr: 47.5, vertical: 'FOOD' },
         };
 
         // L1 reason for contact is *implicit* in the stage. AI infers from context.
@@ -1004,11 +1037,22 @@
                 email: rider.email,
                 customData: {
                   role: 'rider',
+                  // Snoonu-facing
                   public_id: rider.public_id,
                   phone_number: rider.phone_number,
                   transport_type: rider.transport_type,
                   employment_status: rider.employment_status,
                   availability_type: rider.availability_type,
+                  // FalconFlex internal IDs — let the AI skip lookups and call
+                  // /agents, /tasks, /agentAccount/* directly with these.
+                  falconflex_agent_id: rider.falconflex_agent_id,
+                  falconflex_user_id: rider.falconflex_user_id,
+                  falconflex_company_id: rider.falconflex_company_id,
+                  fleet_type_id: rider.fleet_type_id,
+                  transport_type_id: rider.transport_type_id,
+                  employment_status_id: rider.employment_status_id,
+                  availability_type_id: rider.availability_type_id,
+                  // Documents (for ID verification, expiry checks, etc.)
                   qatar_id: rider.qatar_id,
                   qatar_id_expiration_date: rider.qatar_id_expiration_date,
                   passport_no: rider.passport_no,
@@ -1016,6 +1060,11 @@
                   driving_license_expiration_date: rider.driving_license_expiration_date,
                   work_permit_expiration_date: rider.work_permit_expiration_date,
                   joining_date: rider.joining_date,
+                  // Active trip — so even the first chat message has full context
+                  active_trip_order_id: activeTrip.order_id,
+                  active_trip_falconflex_task_id: activeTrip.falconflex_task_id,
+                  active_trip_falconflex_task_short_id: activeTrip.falconflex_task_short_id,
+                  active_supplier_contract_id: suppliers[0].falconflex_supplier_contract_id,
                 },
               },
             },
@@ -1044,7 +1093,10 @@
             sessionCustomData: {
               channel: 'rider_portal',
               rider_public_id: rider.public_id,
+              falconflex_agent_id: rider.falconflex_agent_id,
               trip_id: activeTrip.trip_id,
+              order_id: activeTrip.order_id,
+              falconflex_task_id: activeTrip.falconflex_task_id,
               trip_stage: stage,
               l1_reason: cfg.l1_reason,
             },
