@@ -1,21 +1,22 @@
 # Demo Mocks — webhook.site Reference
 
-Until Snoonu / FalconFlex ships the real endpoints, four AI actions in the Snoonu OpenCX org are backed by **webhook.site** mocks. This doc explains where they live, what they return, and how to flip them mid-demo.
+Until Snoonu / FalconFlex ships the real endpoints, three AI actions in the Snoonu OpenCX org are backed by **webhook.site** mocks. This doc explains where they live, what they return, and how to flip them mid-demo.
 
 > webhook.site is a free public request-capture service. Each "token" is a URL that returns a static `default_content` blob on every request. We use it as a no-infra mock host. Tokens auto-renew on every hit; they expire 7 days after the last call.
 
 ---
 
-## The 4 mocks
+## The 3 mocks
 
 | # | Action name | Mock UUID | Closes which gap |
 |---|---|---|---|
 | 1 | `falconflex_get_driver_removal_cases` | `ef640d3c-9487-4c6e-bb56-02b9194c2ce3` | G1 — driver vehicle-issue safety threshold |
 | 2 | `falconflex_get_task_vertical` | `3e78f203-689a-4140-8b72-66565bba6c3a` | G2 — order vertical / classification |
 | 3 | `falconflex_get_agent_profile` | `c861d8ff-aaf4-457e-af5f-8d78aea5e272` | PII-redacted agent view (cybersec gate) |
-| 4 | `maps_get_merchant_waze_link` | `55139563-fe29-4411-aaa6-5e75e057d560` | F2 — Waze deep link from merchant coordinates |
 
 Each action's `api_endpoint` is `https://webhook.site/<UUID>/api/v1/...`. The path suffix after the UUID is decorative — webhook.site returns the same JSON regardless.
+
+> **Note on Waze / navigation links:** there is no Waze mock and no `maps_*` action. Navigation deep links are constructed inline by the AI from live `falconflex_get_task.pickup.{latitude,longitude}` data — see the OpenCX instruction page "Navigation links — always construct Waze deep links from live task coordinates" (id `cb4ba4f3`). The Waze deep-link URL scheme (`https://waze.com/ul?ll=<lat>,<lng>&navigate=yes`) is pure string construction; no API key or backend call is needed, and the coordinates change per task because they come straight from FalconFlex's live `/tasks/get` endpoint.
 
 ---
 
@@ -82,30 +83,6 @@ Each action's `api_endpoint` is `https://webhook.site/<UUID>/api/v1/...`. The pa
 
 ---
 
-## 4. `maps_get_merchant_waze_link`
-
-**Purpose:** Generate a Waze deep link from merchant coordinates. Used in Flow 2 (Unable to find merchant). The Waze "API" is pure URL construction (no key, no real network call to Waze) — this action just wraps the pattern so the AI's tool-use trace explicitly logs that a navigation link was produced.
-
-**URL:** `https://webhook.site/55139563-fe29-4411-aaa6-5e75e057d560/api/v1/maps/waze-link?latitude=<lat>&longitude=<lng>&address=<addr>&merchant_name=<name>`
-
-**Response (current default):**
-```json
-{
-  "merchant_name": "Open Test Supplier",
-  "latitude": 25.286,
-  "longitude": 51.534,
-  "address": "123 Bin Mahmud, Doha",
-  "waze_url": "https://waze.com/ul?ll=25.286,51.534&navigate=yes",
-  "alt_url_google_maps": "https://maps.google.com/?q=25.286,51.534"
-}
-```
-
-**Tunable:** `latitude` + `longitude` + `address` + `merchant_name` + `waze_url`. If the demo task changes, update all four to keep them in sync. The `waze_url` follows the pattern `https://waze.com/ul?ll=<lat>,<lng>&navigate=yes` — works on iOS and Android Waze apps. Without Waze installed, the link falls back to Waze Livemap in a browser.
-
-> Production note: this action does not need to be a backend call. The AI can construct the URL inline from `falconflex_get_task.pickup.{latitude,longitude}`. The action exists for demo observability and so Snoonu can later swap in a real backend that adds traffic-aware ETAs, route polylines, etc., without changing the AI's call site.
-
----
-
 ## Flip mocks mid-demo
 
 ### Helper script (recommended)
@@ -134,7 +111,6 @@ Each mock has a dashboard at `https://webhook.site/#!/view/<UUID>`. Edit the "De
 - removal_cases — https://webhook.site/#!/view/ef640d3c-9487-4c6e-bb56-02b9194c2ce3
 - task_vertical — https://webhook.site/#!/view/3e78f203-689a-4140-8b72-66565bba6c3a
 - agent_profile — https://webhook.site/#!/view/c861d8ff-aaf4-457e-af5f-8d78aea5e272
-- waze_link — https://webhook.site/#!/view/55139563-fe29-4411-aaa6-5e75e057d560
 
 ### Direct curl (fastest if you know the shape)
 
