@@ -1032,7 +1032,11 @@
             },
 
             user: {
-              externalId: rider.public_id,
+              // Per-refresh externalId so each page load is a fresh contact +
+              // fresh chat. Avoids picking up stale open sessions left over by
+              // the inactivity workflow's user-was-last-sender skip rule (see
+              // backend/src/workflow/services/session-inactivity.service.worker.ts:454).
+              externalId: rider.public_id + '-' + Date.now(),
               data: {
                 name: rider.full_name,
                 email: rider.email,
