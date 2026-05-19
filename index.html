@@ -1067,6 +1067,32 @@
               trip_stage: stage,
             },
 
+            // End-conversation button on the chat header. Resolves the current
+            // OpenCX session; the `reset-chat` aftermath clears the in-memory
+            // chat so the next user message creates a brand-new session.
+            headerButtons: {
+              chatScreen: [
+                {
+                  functionality: 'resolve-session',
+                  icon: 'CircleCheck',
+                  onResolved: 'reset-chat',
+                  confirmation: {
+                    type: 'modal',
+                    title: 'End this conversation?',
+                    description:
+                      'This will close the current chat and start a fresh one.',
+                    confirmButtonText: 'End conversation',
+                    cancelButtonText: 'Cancel',
+                  },
+                  behaviorBeforeSessionCreation: 'disabled',
+                  behaviorIfSessionIsResolved: 'reset-chat',
+                },
+              ],
+            },
+
+            // Native "This was helpful / I need more help" prompt after AI replies.
+            thisWasHelpfulOrNot: { enabled: true },
+
             // Persistent banner pinned at the top of the chat — stage-specific.
             advancedInitialMessages: [
               {
