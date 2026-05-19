@@ -1074,7 +1074,7 @@
               chatScreen: [
                 {
                   functionality: 'resolve-session',
-                  icon: 'CircleCheck',
+                  icon: 'X',
                   onResolved: 'reset-chat',
                   confirmation: {
                     type: 'modal',
@@ -1092,6 +1092,11 @@
 
             // Native "This was helpful / I need more help" prompt after AI replies.
             thisWasHelpfulOrNot: { enabled: true },
+
+            // Single-conversation mode: hide the sessions list entirely and
+            // disallow having more than one open session at a time.
+            router: { chatScreenOnly: true },
+            oneOpenSessionAllowed: true,
 
             // Persistent banner pinned at the top of the chat — stage-specific.
             advancedInitialMessages: [
